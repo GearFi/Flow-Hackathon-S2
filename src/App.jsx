@@ -2,7 +2,11 @@ import './App.css'
 import { useState, useEffect } from 'react'
 import { setupUserTx } from './cadence/transactions/setup_user'
 import { mintNFT } from './cadence/transactions/mint_nft'
+import {listForSaleTx} from "./cadence/transactions/list_for_sale.js";
+import {unlistFromSaleTx} from "./cadence/transactions/unlist_from_sale.js";
+
 import Collection from "./Collection";
+import SaleCollection from "./SaleCollection.js";
 
 import * as fcl from '@onflow/fcl'
 import * as t from '@onflow/types'
@@ -16,11 +20,13 @@ fcl
   .put('discovery.wallet', 'https://fcl-discovery.onflow.org/testnet/authn')
 
 function App() {
-  const [user, setUser] = useState()
-  const [nameOfNFT, setNameOfNFT] = useState('')
-  const [hash, setHash] = useState('')
-  const [address, setAddress] = useState()
-  const [officialAddress, setOfficialAddress] = useState('')
+  const [user, setUser] = useState();
+  const [nameOfNFT, setNameOfNFT] = useState('');
+  const [hash, setHash] = useState();
+  const [id, setID] = useState();
+  const [price, setPrice] = useState();
+  const [address, setAddress] = useState();
+  const [officialAddress, setOfficialAddress] = useState('');
 
   useEffect(() => {
     fcl.currentUser().subscribe(setUser)
@@ -66,6 +72,39 @@ function App() {
     return fcl.tx(transactionId).onceSealed()
   }
 
+  const listForSale = async () => {
+    const transactionId = await fcl.send([
+      fcl.transaction(listForSaleTx),
+      fcl.args([
+        fcl.arg(parseInt(id), t.UInt64),
+        fcl.arg(price, t.UFix64)
+      ]),
+      fcl.payer(fcl.authz),
+      fcl.proposer(fcl.authz),
+      fcl.authorizations([fcl.authz]),
+      fcl.limit(9999)
+    ]).then(fcl.decode);
+
+    console.log(transactionId);
+    return fcl.tx(transactionId).onceSealed();
+  }
+
+  const unlistFromSale = async () => {
+    const transactionId = await fcl.send([
+      fcl.transaction(unlistFromSaleTx),
+      fcl.args([
+        fcl.arg(parseInt(id), t.UInt64)
+      ]),
+      fcl.payer(fcl.authz),
+      fcl.proposer(fcl.authz),
+      fcl.authorizations([fcl.authz]),
+      fcl.limit(9999)
+    ]).then(fcl.decode);
+
+    console.log(transactionId);
+    return fcl.tx(transactionId).onceSealed();
+  }
+
   return (
     <div>
       <h1>
@@ -90,9 +129,23 @@ function App() {
         <button onClick={() => setOfficialAddress(address)}>Search</button>
       </div>
       <hr />
+      <div>
+        <input type="text" onChange={(e) => setID(e.target.value)} placeholder='id'/>
+        <input type="text" onChange={(e) => setPrice(e.target.value)} placeholder='price'/>
+        <button onClick={() => listForSale()}>Lift NFT for Sale</button>
+        <button onClick={() => unlistFromSale()}>Unlist an NFT from Sale</button>
+      </div>
+      <hr />
       {user && user.addr && officialAddress && officialAddress !== '' ? (
         <Collection address={officialAddress}></Collection>
       ) : null}
+      <hr />
+      { user && user.addr && officialAddress && officialAddress !== ''
+        ?<SaleCollection address={officialAddress}></SaleCollection>
+        :
+        null
+      }
+      
     </div>
   )
 }
@@ -105,9 +158,14 @@ export default App
 //private key: 6ee48565778ff885d81c9f31f3ec04432e44f3570e576f071ea4f779be1653f4
 //public keyy: 084d9dc52edd4c0cc09635df3b8481ab9b0e540a5ae0a0d7d1a6f0034a1d44cf3a0add038f4bacc2f0a045a09dd0e444d4d1ec2095ddb5b230c37081bff787fe
 //address: 0xa488aa6b903b1202
+
 //service account: 0xf8d6e0586b0a20c7
 
 //------------------------
 // Private Key              dc1d0a91856cda6180da553ac21a858a53ecd812ec3833a31b176bb7c1d8e432
 // Public Key               7018274c3fc5859d798a95198fb97765e395dc9f6ad7c3e6d4d2f3e6985e0a0d15d5a0a1698de8d9d17468a25d9925ac46b8f7ebd19044e4364e0239d803a73c
 // Address                  0x63fbacb124806e4b
+
+
+//krishnaagrawal2992    0x02deabac75a16f74
+//shreyashagr2992       0xf53c92a16aac6b6f

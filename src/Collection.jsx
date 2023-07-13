@@ -12,35 +12,19 @@ export default function Collection(props) {
     getUserNFTs()
   }, [])
 
-    const getUserNFTs = async () => {
-        const result = await fcl.send([
-            fcl.script(`pub fun main(message: Address): Address {
-                return message
-              }`),
-            fcl.args([
-                fcl.arg(props.address, t.Address)
-            ])
-        ]).then(fcl.decode);
+  const getUserNFTs = async () => {
+    const result = await fcl
+      .send([
+        fcl.script(getNFTsScript),
+        fcl.args([fcl.arg(props.address, t.Address)]),
+      ])
+      .then(fcl.decode)
 
-        console.log(result);
-        setNFTs(result);
-    }
 
-//   const getUserNFTs = async () => {
-//     const response = await fcl.query({
-//       cadence: `
-//       import MyNFT from 0x63fbacb124806e4b
-//       import NonFungibleToken from 0x631e88ae7f1d7c20
-
-//       pub fun main(account: Address): Address {
-        
-//                 return message
-//               }`, // CADENCE CODE GOES IN THESE ``
-//       args: (arg, t) => [fcl.arg(props.address, t.Address)], // ARGUMENTS GO IN HERE
-//     })
-
-//     console.log('Response from our script: ' + response)
-//   }
+    console.log(result)
+    setNFTs(result)
+    console.log('success')
+  }
 
   return (
     <div style={{ backgroundColor: 'lightgreen' }}>

@@ -43,7 +43,7 @@
 		},
 		"testnet": {
 			"testnet-account": [
-				"MyNFT"
+				"NFTMarketplace"
 			]
 		}
 	}

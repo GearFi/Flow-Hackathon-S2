@@ -86,5 +86,4 @@ pub contract FlowToken: FungibleToken {
     init() {
       self.totalSupply = 0.0
     } 
-
 }

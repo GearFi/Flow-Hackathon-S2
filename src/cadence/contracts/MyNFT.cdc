@@ -23,6 +23,7 @@ pub contract MyNFT: NonFungibleToken {
   }
 
   pub resource interface CollectionPublic {
+    
     pub fun borrowEntireNFT(id: UInt64): &MyNFT.NFT
   }
 
@@ -75,4 +76,4 @@ pub contract MyNFT: NonFungibleToken {
   init() {
     self.totalSupply = 0
   }
-} 
+}
