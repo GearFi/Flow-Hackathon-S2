@@ -1,0 +1,50 @@
+{
+	"contracts": {
+		"FlowToken": "./src/cadence/contracts/FlowToken.cdc",
+		"FungibleToken": "./src/cadence/contracts/FungibleToken.cdc",
+		"MyNFT": "./src/cadence/contracts/MyNFT.cdc",
+		"NFTMarketplace": "./src/cadence/contracts/NFTMarketplace.cdc"
+	},
+	"networks": {
+		"emulator": "127.0.0.1:3569",
+		"mainnet": "access.mainnet.nodes.onflow.org:9000",
+		"testnet": "access.devnet.nodes.onflow.org:9000"
+	},
+	"accounts": {
+		"Krishna": {
+			"address": "01cf0e2f2f715450",
+			"key": "efd970d2bd70c39a21487d3864fa9ac34f2e73ec87b946dc48f1fcdaf28f9c17"
+		},
+		"Shreyash": {
+			"fromFile": "Shreyash.private.json"
+		},
+		"emulator-account": {
+			"address": "f8d6e0586b0a20c7",
+			"key": "a76f7cebb0ff5cfac15614d01ab068dca2c942bc27b744a7b349521103446b88"
+		},
+		"testnet-account": {
+			"address": "0x63fbacb124806e4b",
+			"key": {
+				"type": "hex",
+				"index": 0,
+				"signatureAlgorithm": "ECDSA_secp256k1",
+				"hashAlgorithm": "SHA3_256",
+				"privateKey": "dc1d0a91856cda6180da553ac21a858a53ecd812ec3833a31b176bb7c1d8e432"
+			}
+		}
+	},
+	"deployments": {
+		"emulator": {
+			"emulator-account": [
+				"MyNFT",
+				"FlowToken",
+				"NFTMarketplace"
+			]
+		},
+		"testnet": {
+			"testnet-account": [
+				"MyNFT"
+			]
+		}
+	}
+}
