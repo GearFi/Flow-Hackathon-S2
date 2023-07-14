@@ -2,7 +2,7 @@
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import MyNFT from 0x63fbacb124806e4b
 import FungibleToken from 0x9a0766d93b6608b7
-import FlowToken from 0x7e60df042a9c0868
+import FlowToken from 0x63fbacb124806e4b
 
 pub contract NFTMarketplace {
 
@@ -43,9 +43,10 @@ pub contract NFTMarketplace {
     }
 
     pub fun purchase(id: UInt64, recipientCollection: &MyNFT.Collection{NonFungibleToken.CollectionPublic}, payment: @FlowToken.Vault) {
-      pre {
-        payment.balance == self.forSale[id]: "The payment is not equal to the price of the NFT"
-      }
+      let loanVault = getAccount(vaultAddress).getCapability(/public/LoanVault)
+                    .borrow<&FlowToken.Vault>()
+                    ?? panic("Can't get the LoanVault.")
+
 
       recipientCollection.deposit(token: <- self.MyNFTCollection.borrow()!.withdraw(withdrawID: id))
       self.FlowTokenVault.borrow()!.deposit(from: <- payment)

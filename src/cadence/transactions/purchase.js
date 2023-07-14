@@ -2,7 +2,7 @@ export const purchaseTx = `
 import MyNFT from 0x63fbacb124806e4b
 import NonFungibleToken from 0x631e88ae7f1d7c20
 import NFTMarketplace from 0x63fbacb124806e4b
-import FlowToken from 0x7e60df042a9c0868
+import FlowToken from 0x63fbacb124806e4b
 
 transaction(account: Address, id: UInt64) {
 

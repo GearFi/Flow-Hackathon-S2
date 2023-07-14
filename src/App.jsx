@@ -4,6 +4,7 @@ import { setupUserTx } from './cadence/transactions/setup_user'
 import { mintNFT } from './cadence/transactions/mint_nft'
 import {listForSaleTx} from "./cadence/transactions/list_for_sale.js";
 import {unlistFromSaleTx} from "./cadence/transactions/unlist_from_sale.js";
+import {mintScript} from "./cadence/transactions/mint_tokens.js";
 
 import Collection from "./Collection";
 import SaleCollection from "./SaleCollection.js";
@@ -105,8 +106,32 @@ function App() {
     return fcl.tx(transactionId).onceSealed();
   }
 
+  const mintFlowTokens = async (amount, address) => {
+    const transactionId = await fcl.send([
+      fcl.transaction(mintScript),
+      fcl.args([
+        fcl.arg(parseInt(amount), t.UInt64),
+        fcl.arg(address, t.Address)
+      ]),
+      fcl.payer(fcl.authz),
+      fcl.proposer(fcl.authz),
+      fcl.authorizations([fcl.authz]),
+      fcl.limit(9999)
+    ]).then(fcl.decode);
+
+    console.log(transactionId);
+    return fcl.tx(transactionId).onceSealed();
+  }
+
   return (
     <div>
+
+      <hr />
+      <hr />
+      <button onClick = {()=> mintFlowTokens(100, 0x63fbacb124806e4b)}>Mint</button>
+      <hr />
+      <hr />
+      <hr />
       <h1>
         Account Address:
         {user && user.addr ? user.addr : ''}
@@ -169,3 +194,41 @@ export default App
 
 //krishnaagrawal2992    0x02deabac75a16f74
 //shreyashagr2992       0xf53c92a16aac6b6f
+//meta.devc@gmail.com   0x3edcc08611cde24c
+
+
+// 1
+// sentence
+
+// 2
+// people
+
+// 3
+// rapid
+
+// 4
+// country
+
+// 5
+// enroll
+
+// 6
+// casino
+
+// 7
+// trash
+
+// 8
+// grid
+
+// 9
+// erode
+
+// 10
+// drop
+
+// 11
+// goat
+
+// 12
+// segment
