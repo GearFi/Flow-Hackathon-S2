@@ -2,7 +2,11 @@
 	"contracts": {
 		"FlowToken": "./src/cadence/contracts/FlowToken.cdc",
 		"MyNFT": "./src/cadence/contracts/MyNFT.cdc",
-		"NFTMarketplace": "./src/cadence/contracts/NFTMarketplace.cdc"
+		"NFTMarketplace": "./src/cadence/contracts/NFTMarketplace.cdc",
+		"NFTMarketplace2": "./src/cadence/contracts/NFTMarketplace2.cdc",
+		"NonFungibleToken": "./src/cadence/contracts/NonFungibleToken.cdc",
+		"FungibleToken": "./src/cadence/contracts/FungibleToken.cdc",
+		"tempNFTM": "./src/cadence/tempFolder/tempNFTM.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
@@ -22,27 +26,25 @@
 			"key": "a76f7cebb0ff5cfac15614d01ab068dca2c942bc27b744a7b349521103446b88"
 		},
 		"testnet-account": {
-			"address": "0xa7c3876ff52b8b70",
+			"address": "0x63fbacb124806e4b",
 			"key": {
 				"type": "hex",
 				"index": 0,
 				"signatureAlgorithm": "ECDSA_secp256k1",
 				"hashAlgorithm": "SHA3_256",
-				"privateKey": "bc7c62ae3d01da7a9c7c9a0fba69ff7e40f13c3c6084d7722ff117dcc55c4348"
+				"privateKey": "dc1d0a91856cda6180da553ac21a858a53ecd812ec3833a31b176bb7c1d8e432"
 			}
 		}
 	},
 	"deployments": {
 		"emulator": {
 			"emulator-account": [
-				"MyNFT",
-				"FlowToken",
 				"NFTMarketplace"
 			]
 		},
 		"testnet": {
 			"testnet-account": [
-				"FlowToken"
+				"NFTMarketplace2"
 			]
 		}
 	}

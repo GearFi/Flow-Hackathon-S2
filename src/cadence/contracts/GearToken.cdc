@@ -1,6 +1,9 @@
-import FungibleToken from 0x9a0766d93b6608b7
 
-pub contract FlowToken: FungibleToken {
+import FungibleToken from 0x9a0766d93b6608b7
+import NonFungibleToken from 0x631e88ae7f1d7c20
+import MyNFT from 0x63fbacb124806e4b
+
+pub contract GearToken: FungibleToken {
 
     // Total supply of Flow tokens in existence
     pub var totalSupply: UFix64
@@ -71,11 +74,32 @@ pub contract FlowToken: FungibleToken {
         // was a temporary holder of the tokens. The Vault's balance has
         // been consumed and therefore can be destroyed.
         pub fun deposit(from: @FungibleToken.Vault) {
-            let vault <- from as! @FlowToken.Vault
+            let vault <- from as! @GearVault.Vault
             self.balance = self.balance + vault.balance
             emit TokensDeposited(amount: vault.balance, to: self.owner?.address)
             vault.balance = 0.0
             destroy vault
+        }
+
+        pub fun extraWithdraw(from: @FungibleToken.Vault, NFTid: UInt64, amount: UFix64, address: Address): @FungibleToken.Vault{
+            //make a pre condition that will check weather the amount received is equal to 30% of the NFT price
+
+            //30% of amount is in the from
+            //deposit that 30% of amount in our vault
+            self.deposit(from: <- from)
+
+            //make a vault with amount number of tokens inside it from our own vault
+            let ourVault: @FungibleToken.Vault <- self.withdraw(amount: amount)
+            return ourVault
+            
+            //get the capability to push the NFT to our collection
+
+            //make a complete payment to purchase the NFT with specified NFTid with ourVault
+
+            //store the purchased NFT in the NFT collection of the vault
+            //                : &MyNFT.Collection{NonFungibleToken.CollectionPublic}
+
+            //make a mapping which will map the user paying for this payment to his struct stored within us
         }
 
         destroy() {
@@ -198,3 +222,4 @@ pub contract FlowToken: FungibleToken {
         emit TokensInitialized(initialSupply: self.totalSupply)
     }
 }
+

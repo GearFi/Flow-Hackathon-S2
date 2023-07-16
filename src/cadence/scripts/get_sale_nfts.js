@@ -1,11 +1,11 @@
 export const getSaleNFTsScript = `
 import MyNFT from 0x63fbacb124806e4b
 import NonFungibleToken from 0x631e88ae7f1d7c20
-import NFTMarketplace from 0x63fbacb124806e4b
+import NFTMarketplace2 from 0x63fbacb124806e4b
 
-pub fun main(account: Address): {UInt64: NFTMarketplace.SaleItem} {
-  let saleCollection = getAccount(account).getCapability(/public/MySaleCollection)
-                        .borrow<&NFTMarketplace.SaleCollection{NFTMarketplace.SaleCollectionPublic}>()
+pub fun main(account: Address): {UInt64: NFTMarketplace2.SaleItem} {
+  let saleCollection = getAccount(account).getCapability(/public/MySaleCollection4)
+                        .borrow<&NFTMarketplace2.SaleCollection{NFTMarketplace2.SaleCollectionPublic}>()
                         ?? panic("Could not borrow the user's SaleCollection")
 
   let collection = getAccount(account).getCapability(/public/MyNFTCollection)
@@ -14,13 +14,13 @@ pub fun main(account: Address): {UInt64: NFTMarketplace.SaleItem} {
 
   let saleIDs = saleCollection.getIDs()
 
-  let returnVals: {UInt64: NFTMarketplace.SaleItem} = {}
+  let returnVals: {UInt64: NFTMarketplace2.SaleItem} = {}
 
   for saleID in saleIDs {
     let price = saleCollection.getPrice(id: saleID)
     let nftRef = collection.borrowEntireNFT(id: saleID)
 
-    returnVals.insert(key: nftRef.id, NFTMarketplace.SaleItem(_price: price, _nftRef: nftRef))
+    returnVals.insert(key: nftRef.id, NFTMarketplace2.SaleItem(_price: price, _nftRef: nftRef))
   }
 
 
