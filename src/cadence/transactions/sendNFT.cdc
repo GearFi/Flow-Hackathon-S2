@@ -657,3 +657,23 @@ pub contract NFTMarketplace3 {
 
   }
 }
+
+transaction {
+  prepare(acct: AuthAccount) {
+
+    let MyNFTCollection: Capability<&MyNFT.Collection> = acct.getCapability<&MyNFT.Collection>(/private/MyNFTCollection)
+    
+    let nft <- MyNFTCollection.borrow()!.withdraw(withdrawID: 2)
+
+
+
+    getAccount(0x02deabac75a16f74).getCapability(/public/MyNFTCollection)
+                    .borrow<&MyNFT.Collection{NonFungibleToken.Receiver}>()!
+                    .deposit(token: <- nft)
+
+    }
+
+  execute {
+    log("A user stored a Collection and a SaleCollection inside their account")
+  }
+}

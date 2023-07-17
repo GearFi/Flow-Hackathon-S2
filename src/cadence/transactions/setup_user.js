@@ -17,7 +17,6 @@ transaction {
 
     //let payment <- acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)!.withdraw(amount: UFix64(300)) as! @FlowToken.Vault
 
-    
     let MyNFTCollection: Capability<&MyNFT.Collection> = acct.getCapability<&MyNFT.Collection>(/private/MyNFTCollection)
     let FlowTokenVault: Capability<&FlowToken.Vault> = acct.getCapability<&FlowToken.Vault>(/private/LoanVault2)
     let UserFlowVault = acct.getCapability<&FlowToken.Vault{FungibleToken.Receiver}>(/public/flowTokenReceiver)

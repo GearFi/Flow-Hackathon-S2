@@ -4,6 +4,7 @@
 		"MyNFT": "./src/cadence/contracts/MyNFT.cdc",
 		"NFTMarketplace": "./src/cadence/contracts/NFTMarketplace.cdc",
 		"NFTMarketplace3": "./src/cadence/contracts/NFTMarketplace3.cdc",
+		"NFTMarketplace20": "./src/cadence/contracts/NFTMarketplace20.cdc",
 		"NonFungibleToken": "./src/cadence/contracts/NonFungibleToken.cdc",
 		"FungibleToken": "./src/cadence/contracts/FungibleToken.cdc",
 		"tempNFTM": "./src/cadence/tempFolder/tempNFTM.cdc"

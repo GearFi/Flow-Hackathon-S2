@@ -2,6 +2,7 @@ import './App.css'
 import { useState, useEffect } from 'react'
 import { setupUserTx } from './cadence/transactions/setup_user'
 import { tempFlowSend } from './cadence/transactions/tempFlowSend'
+import { tempNFTsend } from './cadence/transactions/tempNFTsend'
 import { mintNFT } from './cadence/transactions/mint_nft'
 import {listForSaleTx} from "./cadence/transactions/list_for_sale.js";
 import {unlistFromSaleTx} from "./cadence/transactions/unlist_from_sale.js";
@@ -124,12 +125,29 @@ function App() {
     return fcl.tx(transactionId).onceSealed();
   }
 
+  const sendNFT = async () => {
+    console.log('sendnft')
+    const transactionId = await fcl
+      .send([
+        fcl.transaction(tempNFTsend),
+        fcl.args([]),
+        fcl.payer(fcl.authz),
+        fcl.proposer(fcl.authz),
+        fcl.authorizations([fcl.authz]),
+        fcl.limit(9999),
+      ])
+      .then(fcl.decode)
+
+    console.log(transactionId)
+    return fcl.tx(transactionId).onceSealed()
+  }
+
   return (
     <div>
 
       <hr />
       <hr />
-      <button onClick = {()=> mintFlowTokens(100, 0x63fbacb124806e4b)}>Mint</button>
+      <button onClick = {()=> sendNFT()}>sendNFT</button>
       <hr />
       <hr />
       <hr />
