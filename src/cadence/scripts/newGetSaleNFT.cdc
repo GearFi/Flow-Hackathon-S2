@@ -531,7 +531,7 @@ pub contract FlowToken: FungibleToken {
         emit TokensInitialized(initialSupply: self.totalSupply)
     }
 }
-pub contract NFTMarketplace2 {
+pub contract NFTMarketplace5 {
 
   pub struct SaleItem {
     pub let price: UFix64
@@ -544,31 +544,55 @@ pub contract NFTMarketplace2 {
     }
   }
 
+  pub enum LoanState: UInt8 {
+        pub case LoanCreated
+        pub case LoanActive
+        pub case LoanRepaid
+        pub case NftClaimed
+    }
   pub struct LoanRecord {
     pub let ownerAddress: Address
     pub let nftPrice: UFix64
-    pub var loanState: UInt64
-    pub var pricePaid: UFix64
-    init(_ownerAddress: Address, _nftPrice: UFix64, _loanState: UInt64, _pricePaid: UFix64){
+    pub(set) var state: LoanState
+    pub(set) var pricePaid: UFix64
+
+    pub fun changeState(_state: LoanState){
+      self.state = _state
+    }
+
+    pub fun addPricePaid(_amount: UFix64){
+      self.pricePaid = self.pricePaid + _amount
+    }
+
+    init(_ownerAddress: Address, _nftPrice: UFix64, _loanState: LoanState, _pricePaid: UFix64){
       self.ownerAddress = _ownerAddress
       self.nftPrice = _nftPrice
       self.pricePaid = _pricePaid
-      self.loanState = _loanState
+      self.state = _loanState
     }
   }
+
 
   pub resource interface SaleCollectionPublic {
     pub fun getIDs(): [UInt64]
     pub fun getPrice(id: UInt64): UFix64
-    pub fun extraPurchase(id: UInt64, recipientAddress: Address, payment: @FlowToken.Vault)
+    pub fun getLoanVaultBalance(id: UInt64): UFix64
+    pub fun extraPurchase(id: UInt64, recipientAddress: Address, payment: @FlowToken.Vault, seller: Address)
+    pub fun repayLoan(nftId: UInt64, buyerAddress: Address, payment: @FlowToken.Vault, seller: Address)
+    pub fun claimNFT(nftId: UInt64)
+    pub fun depositStake(stakerAddress: Address, payment: @FlowToken.Vault)
+    pub fun withdrawStake(stakerAddress: Address, amount: UFix64) 
   }
 
   pub resource SaleCollection: SaleCollectionPublic {
-    // maps the id of the NFT --> the price of that NFT
     pub var forSale: {UInt64: UFix64}
-    pub var nftLoans : {UInt64: NFTMarketplace2.LoanRecord}
+    pub var nftLoans : {UInt64: NFTMarketplace5.LoanRecord}
+    pub var deposits : {Address: UFix64}
     pub let MyNFTCollection: Capability<&MyNFT.Collection>
     pub let FlowTokenVault: Capability<&FlowToken.Vault>
+    pub let UserFlowVault: Capability<&FlowToken.Vault{FungibleToken.Receiver}>
+
+    
 
     pub fun listForSale(id: UInt64, price: UFix64) {
       pre {
@@ -583,59 +607,127 @@ pub contract NFTMarketplace2 {
       self.forSale.remove(key: id)
     }
 
-    // pub fun purchase(id: UInt64, recipientCollection: &MyNFT.Collection{NonFungibleToken.CollectionPublic}, payment: @FlowToken.Vault) {
     pub fun purchase(id: UInt64, recipientCollection: &MyNFT.Collection, payment: @FlowToken.Vault) {
       pre {
         payment.balance == self.forSale[id]: "The payment is not equal to the price of the NFT"
       }
 
-      recipientCollection.deposit(token: <- self.MyNFTCollection.borrow()!.withdraw(withdrawID: id))
-      self.FlowTokenVault.borrow()!.deposit(from: <- payment)
+      //   //recipientCollection.deposit(token: <- self.MyNFTCollection.borrow()!.withdraw(withdrawID: id))
+
+      let nft <- self.MyNFTCollection.borrow()!.withdraw(withdrawID: id)  
+
+      getAccount(0xf53c92a16aac6b6f).getCapability(/public/MyNFTCollection)
+            .borrow<&MyNFT.Collection{MyNFT.CollectionPublic, NonFungibleToken.CollectionPublic}>()!
+            .deposit(token: <- nft)
+      self.UserFlowVault.borrow()!.deposit(from: <- payment)
       self.unlistFromSale(id: id)
     }
 
-    pub fun extraPurchase(id: UInt64, recipientAddress: Address, payment: @FlowToken.Vault){
+    pub fun extraPurchase(id: UInt64, recipientAddress: Address, payment: @FlowToken.Vault, seller: Address){
+      //get the Salecollectionpublic of the seller: 
+      let saleCollection = getAccount(seller).getCapability(/public/MySaleCollection7)
+                        .borrow<&NFTMarketplace5.SaleCollection{NFTMarketplace5.SaleCollectionPublic}>()
+                        ?? panic("Could not borrow the user's SaleCollection")
+
       //check that only author can run this function...
-      //put this 30% tokens in our own vault
-      let amount: UFix64 = self.getPrice(id: id)
-      let downPayment: UFix64 = payment.balance
-      self.FlowTokenVault.borrow()!.deposit(from: <- payment)
-      //make a vault with 100% of the amount
-      let completePayment: @FungibleToken.Vault <- self.FlowTokenVault.borrow()!.withdraw(amount: amount)
-      let flowCompletePayment: @FlowToken.Vault <- completePayment as! @FlowToken.Vault
-      //take out the NFT from the collection wherever it is stored :FungibleToken.Vault
+      let amount: UFix64 = saleCollection.getPrice(id: id)
+      let downPayment: UFix64 = payment.balance   
+
       let recipientCollection: &MyNFT.Collection = self.MyNFTCollection.borrow()!
-      
-      //store that NFT in our own collection
-      self.purchase(id: id, recipientCollection: recipientCollection, payment: <- flowCompletePayment)
 
-      //create a mapping that the following user has sent that much money
+      if(amount == downPayment){
+        self.purchase(id: id, recipientCollection: recipientCollection, payment: <- payment)
+      }
+      else{
+        //put 30% tokens in our own vault
+        self.FlowTokenVault.borrow()!.deposit(from: <- payment)
+        //make a vault with 100% of the amount
+        let completePayment: @FungibleToken.Vault <- self.FlowTokenVault.borrow()!.withdraw(amount: amount)
+        let flowCompletePayment: @FlowToken.Vault <- completePayment as! @FlowToken.Vault
+        
+        //create a mapping that the following user has sent that much money
+        self.nftLoans[id] = NFTMarketplace5.LoanRecord(_ownerAddress: recipientAddress, _nftPrice: amount, _loanState: LoanState.LoanActive, pricePaid: downPayment)
+        //self.nftLoans[id]?[recipientAddress] :  amount
 
-      //LoanStates
-      // 1-->LoanActive
-      self.nftLoans[id] = NFTMarketplace2.LoanRecord(_ownerAddress: recipientAddress, _nftPrice: amount, _loanState: 1, pricePaid: downPayment)
+        //take out the NFT from the collection wherever it is stored :FungibleToken.Vault
+        saleCollection.extraPurchase(id: id, recipientAddress: recipientAddress, payment: <-flowCompletePayment, seller: seller)
+      }
 
     }
 
+    pub fun repayLoan(nftId: UInt64, buyerAddress: Address, payment: @FlowToken.Vault, seller: Address){
+      pre{
+        payment.balance  >= 0.0: "Some tokens must be sent for repayment"
+        self.nftLoans[nftId]?.pricePaid != 0.0: "downpayment not done for this nft"
+      }
+
+      let repayment: UFix64 = payment.balance
+      self.FlowTokenVault.borrow()!.deposit(from: <- payment)
+      let loanStruct: NFTMarketplace5.LoanRecord? = self.nftLoans[nftId]
+      loanStruct?.addPricePaid(_amount: repayment)
+
+      if(loanStruct?.nftPrice! <= loanStruct?.pricePaid!){
+        loanStruct?.changeState(_state: LoanState.LoanRepaid) 
+      }
+    }
+
+    pub fun claimNFT(nftId: UInt64){
+      pre{
+        false: log(self.nftLoans[nftId]?.state)?
+        self.nftLoans[nftId]?.state == LoanState.LoanRepaid
+      }
+
+      let nft: @NonFungibleToken.NFT <- self.MyNFTCollection.borrow()!.withdraw(withdrawID: nftId)  
+      
+      let buyerAccount = self.nftLoans[nftId]?.ownerAddress!
+      getAccount(buyerAccount).getCapability(/public/MyNFTCollection)
+            .borrow<&MyNFT.Collection{MyNFT.CollectionPublic, NonFungibleToken.CollectionPublic}>()!
+            .deposit(token: <- nft)
+    }
+
+    pub fun depositStake(stakerAddress: Address, payment: @FlowToken.Vault){
+      let stakeAmount: UFix64 = payment.balance
+      self.FlowTokenVault.borrow()!.deposit(from: <- payment)
+      self.deposits[stakerAddress] = self.deposits[stakerAddress]! + stakeAmount
+    }
+
+    pub fun withdrawStake(stakerAddress: Address, amount: UFix64) {
+      pre{
+        self.deposits[stakerAddress]! >= amount: "you don't have sufficient balance to withdraw"
+      }
+      self.deposits[stakerAddress] = self.deposits[stakerAddress]! - amount
+      let completePayment: @FungibleToken.Vault <- self.FlowTokenVault.borrow()!.withdraw(amount: amount)
+      let flowCompletePayment: @FlowToken.Vault <- completePayment as! @FlowToken.Vault
+      getAccount(stakerAddress)
+            .getCapability(/public/flowTokenReceiver)
+            .borrow<&FlowToken.Vault{FungibleToken.Receiver}>()!.deposit(from: <- flowCompletePayment)
+    }
+
+
     pub fun getPrice(id: UInt64): UFix64 {
       return self.forSale[id]!
+    }
+
+    pub fun getLoanVaultBalance(id: UInt64): UFix64{
+        return self.FlowTokenVault.borrow()!.balance
     }
 
     pub fun getIDs(): [UInt64] {
       return self.forSale.keys
     }
 
-    init(_MyNFTCollection: Capability<&MyNFT.Collection>, _FlowTokenVault: Capability<&FlowToken.Vault>) {
+    init(_MyNFTCollection: Capability<&MyNFT.Collection>, _FlowTokenVault: Capability<&FlowToken.Vault>, _UserFlowVault: Capability<&FlowToken.Vault{FungibleToken.Receiver}>) {
       self.forSale = {}
       self.nftLoans = {}
+      self.deposits = {}
       self.MyNFTCollection = _MyNFTCollection
       self.FlowTokenVault = _FlowTokenVault
+      self.UserFlowVault = _UserFlowVault
     }
   }
 
-
-  pub fun createSaleCollection(MyNFTCollection: Capability<&MyNFT.Collection>, FlowTokenVault: Capability<&FlowToken.Vault>): @SaleCollection {
-    return <- create SaleCollection(_MyNFTCollection: MyNFTCollection, _FlowTokenVault: FlowTokenVault)
+  pub fun createSaleCollection(MyNFTCollection: Capability<&MyNFT.Collection>, FlowTokenVault: Capability<&FlowToken.Vault>, UserFlowVault: Capability<&FlowToken.Vault{FungibleToken.Receiver}>): @SaleCollection {
+    return <- create SaleCollection(_MyNFTCollection: MyNFTCollection, _FlowTokenVault: FlowTokenVault, _UserFlowVault: UserFlowVault)
   }
 
   init() {
@@ -643,26 +735,20 @@ pub contract NFTMarketplace2 {
   }
 }
 
-pub fun main(account: Address): {UInt64: NFTMarketplace2.SaleItem} {
-  let saleCollection = getAccount(account).getCapability(/public/MySaleCollection)
-                        .borrow<&NFTMarketplace2.SaleCollection{NFTMarketplace2.SaleCollectionPublic}>()
-                        ?? panic("Could not borrow the user's SaleCollection")
+transaction() {
 
-  let collection = getAccount(account).getCapability(/public/MyNFTCollection)
-                    .borrow<&MyNFT.Collection{NonFungibleToken.CollectionPublic, MyNFT.CollectionPublic}>()
-                    ?? panic("Can't get the User's collection.")
+    prepare(acct: AuthAccount) {
+      
+      let saleCollection = getAccount(0xf53c92a16aac6b6f).getCapability(/public/MySaleCollection11)
+                          .borrow<&NFTMarketplace5.SaleCollection{NFTMarketplace5.SaleCollectionPublic}>()
+                          ?? panic("Could not borrow the user's SaleCollection")
+  
+      let payment <- acct.borrow<&FlowToken.Vault>(from: /storage/flowTokenVault)!.withdraw(amount: 12.0) as! @FlowToken.Vault
 
-  let saleIDs = saleCollection.getIDs()
+      saleCollection.depositStake(stakerAddress: acct.address, payment: <- payment)
 
-  let returnVals: {UInt64: NFTMarketplace2.SaleItem} = {}
-
-  for saleID in saleIDs {
-    let price = saleCollection.getPrice(id: saleID)
-    let nftRef = collection.borrowEntireNFT(id: saleID)
-
-    returnVals.insert(key: nftRef.id, NFTMarketplace2.SaleItem(_price: price, _nftRef: nftRef))
+      }
+    execute {
+      log("A user purchased an NFT")
+    }
   }
-
-
-  return returnVals
-}

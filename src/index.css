@@ -1,13 +1,77 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.glassmorphism {
+	backdrop-filter: blur(4px);
+}
+.text-gradient {
+	-webkit-text-fill-color: transparent;
+	-webkit-background-clip: text;
+	background-color: #fff;
+	background-image: radial-gradient(at 4% 36%, #fff 0, transparent 53%),
+		radial-gradient(at 100% 60%, #000 0, transparent 50%);
+}
+.white-glassmorphism {
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	background: hsla(0, 0%, 100%, 0.05);
+	border: 1px solid hsla(0, 0%, 100%, 0.3);
+	border-radius: 16px;
+}
+#auth_profile {
+	position: relative;
+}
+#auth_profile .logout-btn {
+	height: auto;
+	width: 100%;
+	max-height: 0;
+	display: flex;
+	gap: 5px;
+	justify-content: center;
+	align-items: center;
+	z-index: 1;
+	background: #fff;
+	border-radius: 5px;
+	top: 100%;
+	overflow: hidden;
+	transition: 0.1s ease-in;
+}
+#auth_profile:hover .logout-btn {
+	max-height: 40px;
+}
+.nft-card {
+	perspective: 1000px;
+}
+.nft-card .flip-card {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	transition: transform 0.8s;
+	transform-style: preserve-3d;
+}
+.nft-card:hover .flip-card {
+	transform: rotateY(180deg);
+}
+.nft-card .flip-card img,
+.nft-card .flip-card .cancel-listing-btn,
+.nft-card .flip-card .listing-btn {
+	-webkit-backface-visibility: hidden; /* Safari */
+	backface-visibility: hidden;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.nft-card .flip-card .cancel-listing-btn,
+.nft-card .flip-card .listing-btn {
+	position: absolute;
+	color: white;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	opacity: 1;
+	transform: rotateY(180deg);
 }
+/* .nft-card:hover .cancel-listing-btn {
+	opacity: 1;
+} */
