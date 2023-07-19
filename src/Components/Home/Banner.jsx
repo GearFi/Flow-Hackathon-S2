@@ -28,7 +28,7 @@ export default function Banner2() {
 					<div
 						className="flex md:h-72 md:m-4 m-0 card items-end cursor-pointer bg-cover bg-center aspect-square pb-4 justify-center"
 						style={{
-							backgroundImage: `url('/assets/images/logo.png')`,
+							backgroundImage: `url('/assets/images/banner.png')`,
 						}}
 					></div>
 				</div>
