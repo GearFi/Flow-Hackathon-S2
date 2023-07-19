@@ -38,7 +38,10 @@ const Navbar = () => {
 	}, [user]);
 
 	return (
-		<div id="header" className="bg-[#4d4d4d]">
+		<div
+			id="header"
+			className="bg-[#4d4d4d77] sticky top-0 z-[10000] backdrop-blur-[5px]"
+		>
 			<div className="md:flex items-center justify-between max-w-[1280px] mx-auto relative">
 				<div
 					className="flex items-center text-white justify-between w-[100%]
@@ -75,12 +78,14 @@ const Navbar = () => {
 						</li>
 					</Link>
 
-					<li
-						className="text-[#b7b7b7] list-none capitalize px-4 leading-[40px] text-[16px]
-				md:flex-row md:text-[18px]"
-					>
-						{userBalance} Flow
-					</li>
+					{user && user.addr && (
+						<li
+							className="text-[#b7b7b7] list-none capitalize px-4 leading-[40px] text-[16px]
+				md:flex-row md:text-[18px] font-bold"
+						>
+							{parseFloat(userBalance).toFixed(2)} Flow
+						</li>
+					)}
 
 					<AuthBtn />
 				</div>
