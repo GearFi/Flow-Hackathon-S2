@@ -53,6 +53,7 @@ const Navbar = () => {
 							<img
 								src="/assets/images/logo.png"
 								className="h-14"
+								alt=""
 							/>
 						</div>
 					</Link>
