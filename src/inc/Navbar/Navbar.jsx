@@ -1,14 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineMenu } from "react-icons/ai";
 import AuthBtn from "./AuthBtn";
+import * as fcl from "@onflow/fcl";
+import * as t from "@onflow/types";
+import { get_user_balance } from "../../cadence/scripts/get_user_balance.js";
 
 const Navbar = () => {
+	const [user, setUser] = useState();
 	const [openDrawer, setOpenDrawer] = useState(false);
+	const [userBalance, setUserBalance] = useState("{-}");
 
 	const toggleDrawer = () => {
 		setOpenDrawer((prevOpenDrawer) => !prevOpenDrawer);
 	};
+	useEffect(() => {
+		fcl.currentUser().subscribe(setUser);
+	}, []);
+
+	const getUserBalance = async () => {
+		if (!user || !user.addr) return setUserBalance("{-}");
+
+		const balance = await fcl
+			.send([
+				fcl.script(get_user_balance),
+				fcl.args([fcl.arg(user.addr, t.Address)]),
+			])
+			.then(fcl.decode)
+			.catch((err) => {
+				console.log(err);
+			});
+		setUserBalance(balance);
+	};
+
+	useEffect(() => {
+		getUserBalance();
+	}, [user]);
+
 	return (
 		<div id="header" className="bg-[#4d4d4d]">
 			<div className="md:flex items-center justify-between max-w-[1280px] mx-auto relative">
@@ -38,17 +66,21 @@ const Navbar = () => {
 						"md:max-h-[100%] h-auto flex flex-col text-center gap-1 md:flex-row md:w-[auto] md:h-[100%] md:overflow-visible overflow-hidden ease-in-out duration-150 px-4 bg-[#5b5b5b] md:bg-transparent absolute md:relative top-[104%] right-4 rounded-[8px]"
 					}
 				>
-					<div
-						className="flex text-lg flex-col gap-1 leading-[40px] text-[16px]
-				md:flex-row md:text-[18px]
-				"
+					<Link to="/" className="block md:mt-0 mt-2">
+						<li
+							className="text-white list-none capitalize px-4 hover:text-[#0ea5e9] hover:scale-105 leading-[40px] text-[16px]
+				md:flex-row md:text-[18px]"
+						>
+							Home
+						</li>
+					</Link>
+
+					<li
+						className="text-[#b7b7b7] list-none capitalize px-4 leading-[40px] text-[16px]
+				md:flex-row md:text-[18px]"
 					>
-						<Link to="/" className="block md:mt-0 mt-2">
-							<li className="text-white list-none capitalize px-4 hover:text-[#0ea5e9] hover:scale-105">
-								Home
-							</li>
-						</Link>
-					</div>
+						{userBalance} Flow
+					</li>
 
 					<AuthBtn />
 				</div>

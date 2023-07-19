@@ -1,6 +1,7 @@
 import React from "react";
 import Banner from "./Banner";
 import Discover from "./Discover";
+import Wallet from "./Wallet";
 
 const Home = () => {
 	return (
@@ -14,6 +15,8 @@ const Home = () => {
 			</div>
 
 			<Discover />
+
+			<Wallet />
 		</div>
 	);
 };

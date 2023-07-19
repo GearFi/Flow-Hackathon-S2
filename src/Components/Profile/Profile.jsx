@@ -194,7 +194,7 @@ const Profile = () => {
 						className={
 							(openTab == "nft"
 								? "border-b-[#262626] border-[#d7d7d7]"
-								: "border-[#262626] border-b-[#d7d7d7]") +
+								: "border-[transparent] border-b-[#d7d7d7]") +
 							" border-2 border-b-2 rounded-t-[8px] px-4 leading-[40px] box-border text-[#b7b7b7] cursor-pointer"
 						}
 					>
@@ -209,7 +209,7 @@ const Profile = () => {
 						className={
 							(openTab == "bnpl"
 								? "border-b-[#262626] border-[#d7d7d7]"
-								: "border-[#262626] border-b-[#d7d7d7]") +
+								: "border-[transparent] border-b-[#d7d7d7]") +
 							" border-2 border-b-2 rounded-t-[8px] px-4 leading-[40px] box-border text-[#b7b7b7] cursor-pointer"
 						}
 					>
@@ -224,7 +224,7 @@ const Profile = () => {
 						className={
 							(openTab == "listing"
 								? "border-b-[#262626] border-[#d7d7d7]"
-								: "border-[#262626] border-b-[#d7d7d7]") +
+								: "border-[transparent] border-b-[#d7d7d7]") +
 							" border-2 border-b-2 rounded-t-[8px] px-4 leading-[40px] box-border text-[#b7b7b7] cursor-pointer"
 						}
 					>

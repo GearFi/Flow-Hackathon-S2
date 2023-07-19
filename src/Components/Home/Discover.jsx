@@ -3,12 +3,16 @@ import axios from "axios";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
 import { purchaseTx } from "../../cadence/transactions/purchase.js";
+// import { depositStake } from "../../cadence/transactions/stake.js";
+// import { setupUserTx } from "../../cadence/transactions/setup_user.js";
 
 const Discover = () => {
 	const [user, setUser] = useState();
 	const [nftArr, setNftArr] = useState([]);
 	const [showPopup, setShowPopup] = useState(false);
 	const [nftData, setNftData] = useState([]);
+	const [userBalance, setUserBalance] = useState();
+	const [loanVaultBalance, setLoanVaultBalance] = useState();
 
 	useEffect(() => {
 		fcl.currentUser().subscribe(setUser);
@@ -18,6 +22,7 @@ const Discover = () => {
 		axios
 			.get(`${process.env.REACT_APP_SERVER_URL}/flow_nft`)
 			.then((res) => {
+				// console.log(res)
 				setNftArr(res?.data?.data);
 			});
 	}, []);
@@ -54,12 +59,67 @@ const Discover = () => {
 			});
 	};
 
+	/* const stake = async (amount) => {
+		console.log("stake");
+		if (!user || !user.addr) {
+			fcl.authenticate();
+			return;
+		}
+		const transactionId = await fcl
+			.send([
+				fcl.transaction(depositStake),
+				fcl.args([]),
+				fcl.payer(fcl.authz),
+				fcl.proposer(fcl.authz),
+				fcl.authorizations([fcl.authz]),
+				fcl.limit(9999),
+			])
+			.then(fcl.decode);
+		fcl.tx(transactionId)
+			.onceSealed()
+			.then(() => {
+				alert("You successfully staked ", amount, "FLOW tokens");
+			});
+	};
+ */
+	/* const setupUser = async (price) => {
+		if (!user || !user.addr) {
+			fcl.authenticate();
+			return;
+		}
+		const transactionId = await fcl
+			.send([
+				fcl.transaction(setupUserTx),
+				fcl.args([]),
+				fcl.payer(fcl.authz),
+				fcl.proposer(fcl.authz),
+				fcl.authorizations([fcl.authz]),
+				fcl.limit(9999),
+			])
+			.then(fcl.decode);
+		fcl.tx(transactionId)
+			.onceSealed()
+			.then(() => {
+				alert("User setup successfully");
+			});
+	}; */
+
 	return (
-		<div>
+		<div className="max-w-[1280px] mx-auto p-[10px]">
 			<h2 className="mt-14 text-xl text-white text-center">
 				Discover NFTs
 			</h2>
-
+			{/* <button
+				onClick={() => {
+					stake(100.0);
+				}}
+				className="bg-white m-4"
+			>
+				stake now
+			</button>
+			<button onClick={setupUser} className="bg-white m-4">
+				setup
+			</button> */}
 			<div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mt-4 px-2 py-3">
 				{nftArr && nftArr.length != 0 ? (
 					nftArr.map(
@@ -86,14 +146,36 @@ const Discover = () => {
 													nft.price
 												);
 											}}
-											className="listing-btn text-center font-bold leading-[40px] text-white capitalize bg-[#434234] absolute rounded-t-[15px] px-3 bottom-[65px] right-[5px] opacity-0 duration-150"
+											className="listing-btn font-bold leading-[40px] text-white capitalize absolute rounded-t-[15px] px-3 bottom-[65px] right-[5px] opacity-0 duration-150"
 										>
 											Purchase NFT
+											<br />
+											<div className="text-2xl font-semibold">
+												Price: {nft.price} FLOW
+											</div>
+											{/* <div className={`text-xs font-light mt-0 ${nft.price < userBalance ? 'text-green': 'text-red'}`} >Balance: {userBalance} FLOW</div> */}
+											<div
+												className={`text-xs font-light mt-0 ${
+													nft.price < userBalance
+														? "text-green-400"
+														: "text-red-400"
+												}`}
+											>
+												Balance: {userBalance} FLOW
+											</div>
 										</button>
 									</div>
-									<h1 className="text-center font-bold leading-[40px] text-white capitalize">
-										{nft.nftName}
-									</h1>
+									<div className="text-center">
+										<div className="text-white font-bold">
+											Price: {nft.price}
+										</div>
+										<div className="text-white font-bold">
+											Downpayment: 30%
+										</div>
+										<h1 className="font-bold leading-[40px] text-white capitalize">
+											{nft.nftName}
+										</h1>
+									</div>
 								</div>
 							)
 					)
