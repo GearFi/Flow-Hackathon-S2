@@ -107,11 +107,11 @@ const Stacking = ({ vaultBalance }) => {
 				<div className="text-white">
 					{active === "deposit" ? (
 						<div className="text-xl mt-4 text-center mb-4">
-							Deposit SHM into vault
+							Deposit FLOW into vault
 						</div>
 					) : (
 						<div className="text-xl mt-4 text-center mb-4">
-							Withdraw SHM from vault
+							Withdraw FLOW from vault
 						</div>
 					)}
 					<div className="border border-slate-500 rounded-[5px]">
@@ -161,10 +161,10 @@ const Stacking = ({ vaultBalance }) => {
 
 									<div className="flex flex-col gap-[8px]">
 										<div>
-											Your Balance: {userBalance} SHM
+											Your Balance: {userBalance} FLOW
 										</div>
 										<div>
-											Vault Balance: {vaultBalance} SHM
+											Vault Balance: {vaultBalance} FLOW
 										</div>
 									</div>
 								</div>
@@ -206,7 +206,7 @@ const Stacking = ({ vaultBalance }) => {
 
 									<div className="flex flex-col gap-[8px]">
 										<div>
-											Your Balance: {userBalance} SHM
+											Your Balance: {userBalance} FLOW
 										</div>
 									</div>
 								</div>
