@@ -10,4 +10,4 @@ pub fun main(account: Address): UFix64 {
 
     return balance
 }
-`;
+`

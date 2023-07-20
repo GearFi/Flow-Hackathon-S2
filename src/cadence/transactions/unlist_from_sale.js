@@ -1,10 +1,10 @@
 export const unlistFromSaleTx = `
-import NFTMarketplace4 from 0x63fbacb124806e4b
+import NFTMarketplace5 from 0xdbc62aed64f62dea
 
 transaction(id: UInt64) {
 
   prepare(acct: AuthAccount) {
-    let saleCollection = acct.borrow<&NFTMarketplace4.SaleCollection>(from: /storage/MySaleCollection7)
+    let saleCollection = acct.borrow<&NFTMarketplace5.SaleCollection>(from: /storage/MySaleCollection14)
                             ?? panic("This SaleCollection does not exist")
 
     saleCollection.unlistFromSale(id: id)
@@ -15,4 +15,4 @@ transaction(id: UInt64) {
   }
 }
 
-`
+`;

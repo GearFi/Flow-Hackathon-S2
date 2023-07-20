@@ -14,8 +14,6 @@ const RepayPopup = (props) => {
 		setPop(props.popup);
 	}, [props.popup]);
 
-	console.log(props);
-
 	useEffect(() => {
 		fcl.currentUser().subscribe(setUser);
 	}, []);
@@ -52,7 +50,7 @@ const RepayPopup = (props) => {
 		fcl.tx(transactionId)
 			.onceSealed()
 			.then(() => {
-				if (props?.nftInfo?.price - amt.toFixed(8) != 0) {
+				if (props?.nftInfo?.price - amt.toFixed(8) > 0) {
 					axios.patch(
 						`${process.env.REACT_APP_SERVER_URL}/flow_nft/${user?.addr}/${props?.nftInfo?.nftID}`,
 						{

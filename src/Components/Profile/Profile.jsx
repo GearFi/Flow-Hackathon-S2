@@ -52,11 +52,11 @@ const Profile = () => {
 			.then(fcl.decode)
 			.catch((err) => {
 				// console.log(err);
+				alert("Unable to fetch NFT");
 			});
 
 		if (result) {
 			setIsAccountSetup(true);
-			// console.log(result);
 			setNFTs(result);
 		}
 	};
@@ -70,6 +70,7 @@ const Profile = () => {
 			.then(fcl.decode)
 			.catch((err) => {
 				// console.log(err);
+				alert("Unable to fetch listed NFT");
 			});
 
 		if (result) {
@@ -90,13 +91,11 @@ const Profile = () => {
 			])
 			.then(fcl.decode);
 
-		console.log(transactionId);
-
-		let c = fcl.tx(transactionId).onceSealed();
-		console.log(c);
-		c.then(() => {
-			setIsAccountSetup(true);
-		});
+		fcl.tx(transactionId)
+			.onceSealed()
+			.then(() => {
+				setIsAccountSetup(true);
+			});
 	};
 
 	const openMintNFTPopup = () => {
@@ -107,7 +106,6 @@ const Profile = () => {
 		setMintPop(false);
 	};
 
-	console.log(nfts, listedNfts);
 	return (
 		<div className="max-w-[1280px] mx-auto p-[10px]">
 			<div

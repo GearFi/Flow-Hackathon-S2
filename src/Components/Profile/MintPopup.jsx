@@ -11,9 +11,6 @@ const Popup = (props) => {
 	useEffect(() => {
 		setPop(props.popup);
 	}, [props.popup]);
-
-	console.log(props);
-
 	const mint = async (e) => {
 		e.preventDefault();
 

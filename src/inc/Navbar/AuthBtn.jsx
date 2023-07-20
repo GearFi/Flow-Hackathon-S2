@@ -15,8 +15,6 @@ const AuthBtn = () => {
 		fcl.currentUser().subscribe(setUser);
 	}, []);
 
-	console.log(user);
-
 	return (
 		<div className="leading-[40px] text-[16px] md:text-[18px] md:mb-0 mb-2">
 			{user && user.loggedIn ? (

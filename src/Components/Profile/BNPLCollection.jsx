@@ -19,7 +19,7 @@ export default function BNPLCollection() {
 
 	const repayPopup = (nftID) => {
 		setNftData({
-			...nftArr.find((e) => e.id == nftID),
+			...nftArr.find((e) => e.nftID === nftID),
 		});
 		setShowPopup(true);
 	};
@@ -90,7 +90,7 @@ export default function BNPLCollection() {
 							(nft.state === "BNPL" ||
 								nft.state === "REPAID") && (
 								<div
-									key={nft.nftID}
+									key={nft.nftID + nft.owner}
 									className="nft-card max-w-[250px] flex flex-col border-2 border-[#a3a3a3] rounded-[15px] relative"
 								>
 									<h1 className="absolute top-0 left-0 bg-[#fe6015] px-2 leading-[35px] rounded-tl-[15px] text-white text-[18px] font-bold z-10">
@@ -105,16 +105,21 @@ export default function BNPLCollection() {
 										{nft.state === "BNPL" ? (
 											<button
 												onClick={() => {
-													repayPopup();
+													repayPopup(nft.nftID);
 												}}
-												className="listing-btn text-center font-bold leading-[40px] text-white capitalize bg-[#839442] absolute rounded-t-[15px] px-3 bottom-[65px] right-[5px] opacity-0 duration-150"
+												className="listing-btn text-center font-bold text-white capitalize bg-[#839442] absolute rounded-t-[15px] px-3 bottom-[65px] right-[5px] opacity-0 duration-150"
 											>
-												Repay Loan
+												<div className="leading-[40px] ">
+													Repay Loan
+												</div>
+												<h3 className="text-[14px]">
+													Remaining: {nft.price} FLOW
+												</h3>
 											</button>
 										) : (
 											<button
 												onClick={() => {
-													claimNFT();
+													claimNFT(nft.nftID);
 												}}
 												className="listing-btn text-center font-bold leading-[40px] text-white capitalize bg-[#abf932] absolute rounded-t-[15px] px-3 bottom-[65px] right-[5px] opacity-0 duration-150"
 											>

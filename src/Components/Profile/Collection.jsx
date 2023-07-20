@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { MdClose } from "react-icons/md";
 import Popup from "./ListingPopup";
 
@@ -22,7 +22,7 @@ export default function Collection(props) {
 			<div>
 				{showPopup && (
 					<MdClose
-						className="fixed top-4 right-4 z-[1001] text-white text-[30px] cursor-pointer"
+						className="fixed top-4 right-4 z-[10	01] text-white text-[30px] cursor-pointer"
 						onClick={handlePopUpClose}
 					/>
 				)}

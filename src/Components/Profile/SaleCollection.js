@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
-// import { getSaleNFTsScript } from "../../cadence/scripts/get_sale_nfts.js";
 import { unlistFromSaleTx } from "../../cadence/transactions/unlist_from_sale.js";
 
 function SaleCollection(props) {

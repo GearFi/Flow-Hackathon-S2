@@ -28,7 +28,7 @@ const Navbar = () => {
 			])
 			.then(fcl.decode)
 			.catch((err) => {
-				console.log(err);
+				console.error(err);
 			});
 		setUserBalance(balance);
 	};
@@ -40,7 +40,7 @@ const Navbar = () => {
 	return (
 		<div
 			id="header"
-			className="bg-[#4d4d4d77] sticky top-0 z-[10000] backdrop-blur-[5px]"
+			className="bg-[#4d4d4d77] sticky top-0 z-[100] backdrop-blur-[5px]"
 		>
 			<div className="md:flex items-center justify-between max-w-[1280px] mx-auto relative">
 				<div

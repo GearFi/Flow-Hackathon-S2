@@ -1,7 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-
-import { AiOutlineArrowRight } from "react-icons/ai";
 
 export default function Banner2() {
 	return (

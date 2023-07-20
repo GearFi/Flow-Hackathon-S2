@@ -18,7 +18,6 @@ const Wallet = () => {
 				console.log(err);
 			});
 		setLoanBalance(balance);
-		console.log("loan vault balance is: ", balance);
 	};
 
 	return (

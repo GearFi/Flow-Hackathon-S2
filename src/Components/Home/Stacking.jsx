@@ -4,6 +4,8 @@ import { useState } from "react";
 import * as fcl from "@onflow/fcl";
 import * as t from "@onflow/types";
 import { get_user_balance } from "../../cadence/scripts/get_user_balance.js";
+import { depositStake } from "../../cadence/transactions/stake.js";
+import { withdrawStake } from "../../cadence/transactions/withdraw_stake.js";
 import AuthBtn from "../../inc/Navbar/AuthBtn.jsx";
 
 const Stacking = ({ vaultBalance }) => {
@@ -35,8 +37,69 @@ const Stacking = ({ vaultBalance }) => {
 		getUserBalance();
 	}, [user]);
 
-	const deposit = (amt) => {};
-	const withdraw = (amt) => {};
+	const deposit = async (amount) => {
+		if (!user || !user.addr) {
+			fcl.authenticate();
+			return;
+		}
+
+		amount = parseFloat(amount);
+		if (amount <= 0)
+			return setErrMsg("Deposit amount must be greated than 0");
+
+		const transactionId = await fcl
+			.send([
+				fcl.transaction(depositStake),
+				fcl.args([fcl.arg(amount.toFixed(8), t.UFix64)]),
+				fcl.payer(fcl.authz),
+				fcl.proposer(fcl.authz),
+				fcl.authorizations([fcl.authz]),
+				fcl.limit(9999),
+			])
+			.then(fcl.decode);
+		fcl.tx(transactionId)
+			.onceSealed()
+			.then(() => {
+				alert("You successfully staked FLOW tokens");
+			})
+			.catch((err) => {
+				alert(
+					"ERROR: While making deposite, Please check console for more info"
+				);
+			});
+	};
+	const withdraw = async (amount) => {
+		if (!user || !user.addr) {
+			fcl.authenticate();
+			return;
+		}
+
+		amount = parseFloat(amount);
+		if (amount <= 0)
+			return setErrMsg("Withdraw amount must be greated than 0");
+
+		const transactionId = await fcl
+			.send([
+				fcl.transaction(withdrawStake),
+				fcl.args([fcl.arg(amount.toFixed(8), t.UFix64)]),
+				fcl.payer(fcl.authz),
+				fcl.proposer(fcl.authz),
+				fcl.authorizations([fcl.authz]),
+				fcl.limit(9999),
+			])
+			.then(fcl.decode);
+
+		fcl.tx(transactionId)
+			.onceSealed()
+			.then(() => {
+				alert("Withdraw Amount added to your balance");
+			})
+			.catch((err) => {
+				alert(
+					"ERROR: While making deposite, Please check console for more info"
+				);
+			});
+	};
 
 	return (
 		<div className="mt-8">
