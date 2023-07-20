@@ -6,12 +6,14 @@ import * as t from "@onflow/types";
 import { get_user_balance } from "../../cadence/scripts/get_user_balance.js";
 import { depositStake } from "../../cadence/transactions/stake.js";
 import { withdrawStake } from "../../cadence/transactions/withdraw_stake.js";
+import { get_user_stake } from "../../cadence/scripts/get_user_stake.js";
 import AuthBtn from "../../inc/Navbar/AuthBtn.jsx";
 
 const Stacking = ({ vaultBalance }) => {
 	const [active, setActive] = useState("deposit");
 	const [user, setUser] = useState();
 	const [userBalance, setUserBalance] = useState("{-}");
+	const [stakeBalance, setStackBalance] = useState("{-}");
 	const [errMsg, setErrMsg] = useState(); // for ERROR
 
 	useEffect(() => {
@@ -33,9 +35,27 @@ const Stacking = ({ vaultBalance }) => {
 		setUserBalance(balance);
 	};
 
+	const getStackBalance = async () => {
+		const stake = await fcl
+			.send([
+				fcl.script(get_user_stake),
+				fcl.args([fcl.arg(user.addr, t.Address)]),
+			])
+			.then(fcl.decode)
+			.catch((err) => {
+				console.log(err);
+			});
+
+		setStackBalance(stake);
+	};
+
 	useEffect(() => {
 		getUserBalance();
 	}, [user]);
+
+	useEffect(() => {
+		getStackBalance();
+	}, [active]);
 
 	const deposit = async (amount) => {
 		if (!user || !user.addr) {
@@ -208,6 +228,12 @@ const Stacking = ({ vaultBalance }) => {
 										<div>
 											Your Balance: {userBalance} FLOW
 										</div>
+										{stakeBalance && (
+											<div>
+												Your Stake Balance:{" "}
+												{stakeBalance} FLOW
+											</div>
+										)}
 									</div>
 								</div>
 
